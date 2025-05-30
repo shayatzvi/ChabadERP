@@ -18,7 +18,6 @@ const formSubmissionsCollection = db.collection('form_submissions');
 const publicFormTitle = document.getElementById('publicFormTitle');
 const publicDynamicForm = document.getElementById('publicDynamicForm');
 const submissionMessage = document.getElementById('submissionMessage');
-const publicFormHeader = document.getElementById('publicFormHeader');
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -28,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loadAndRenderForm(formId);
     } else {
         publicFormTitle.textContent = "Form ID not provided.";
-        publicFormHeader.textContent = "Error";
     }
 });
 
@@ -37,13 +35,11 @@ async function loadAndRenderForm(formId) {
         const formDoc = await formsCollection.doc(formId).get();
         if (!formDoc.exists) {
             publicFormTitle.textContent = "Form not found.";
-            publicFormHeader.textContent = "Error";
             return;
         }
 
         const formData = formDoc.data();
         publicFormTitle.textContent = formData.title;
-        publicFormHeader.textContent = formData.title; // Set header too
         publicDynamicForm.innerHTML = ''; // Clear previous form
 
         formData.fields.forEach(field => {
@@ -62,6 +58,7 @@ async function loadAndRenderForm(formId) {
                 inputElement = document.createElement('input');
                 inputElement.type = field.type;
             }
+            inputElement.classList.add('form-control'); // Bootstrap class
 
             inputElement.id = `public_${field.name}`; // Prefix to avoid ID clashes if styles are shared
             inputElement.name = field.name; // Keep original name for data structure
@@ -74,6 +71,7 @@ async function loadAndRenderForm(formId) {
 
         const submitButton = document.createElement('button');
         submitButton.type = 'submit';
+        submitButton.classList.add('btn', 'btn-primary', 'btn-block'); // Bootstrap classes
         submitButton.textContent = 'Submit';
         publicDynamicForm.appendChild(submitButton);
 
@@ -98,13 +96,14 @@ async function loadAndRenderForm(formId) {
             try {
                 await formSubmissionsCollection.add(submissionData);
                 publicDynamicForm.style.display = 'none';
+                submissionMessage.className = 'alert alert-success'; // Bootstrap class
                 submissionMessage.textContent = 'Thank you! Your response has been submitted.';
                 submissionMessage.style.display = 'block';
             } catch (error) {
                 console.error("Error submitting form: ", error);
+                submissionMessage.className = 'alert alert-danger'; // Bootstrap class
                 submissionMessage.textContent = "Error submitting form: " + error.message;
                 submissionMessage.style.display = 'block';
-                submissionMessage.style.color = 'red';
                 submitButton.disabled = false;
                 submitButton.textContent = 'Submit';
             }
@@ -113,6 +112,5 @@ async function loadAndRenderForm(formId) {
     } catch (error) {
         console.error("Error loading form: ", error);
         publicFormTitle.textContent = "Error loading form.";
-        publicFormHeader.textContent = "Error";
     }
 }

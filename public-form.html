@@ -2,36 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Fill Out Form</title>
-    <link rel="stylesheet" href="style.css"> <!-- You might want a separate or simplified CSS -->
+    <!-- Bootstrap 3 CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css"> 
     <style>
-        body { display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
-        main { max-width: 600px; width: 100%; }
-        .form-group label { display: block; margin-bottom: .5em; }
-        .form-group input, .form-group textarea { width: calc(100% - 22px); }
+        body { padding-top: 20px; padding-bottom: 20px; }
+        .form-container { max-width: 600px; margin: auto; }
     </style>
 </head>
 <body>
-
-        <!-- You can have a simpler header or Chabad House branding here -->
-        <h1 id="publicFormHeader">Form</h1>
-
-
-    <main>
-        <section id="form-display-section">
-            <h2 id="publicFormTitle">Loading Form...</h2>
-            <form id="publicDynamicForm">
-                <!-- Dynamic form fields will be rendered here -->
-            </form>
-            <p id="submissionMessage" style="display:none;"></p>
-        </section>
-    </main>
+    <div class="container">
+        <div class="form-container">
+            <div id="form-display-section">
+                <h2 id="publicFormTitle" class="text-center" style="margin-bottom: 20px; margin-top: 0;">Loading Form...</h2>
+                <form id="publicDynamicForm">
+                    <!-- Dynamic form fields will be rendered here -->
+                </form>
+                <div id="submissionMessage" class="alert" style="display:none; margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div> <!-- /container -->
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <script src="public-form-app.js"></script>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins, though not strictly needed for this simple form) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Bootstrap 3 JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>

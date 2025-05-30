@@ -21,18 +21,20 @@ const formSubmissionsCollection = db.collection('form_submissions'); // For subm
 const loginBtn = document.getElementById('loginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const userDetails = document.getElementById('userDetails');
-const contactsSection = document.getElementById('contacts-section');
+const loggedInUserDiv = document.getElementById('loggedInUserDiv');
+
+const contactsModule = document.getElementById('contacts-module'); // Renamed
 const contactForm = document.getElementById('contactForm');
 const contactIdInput = document.getElementById('contactId'); // from contacts
 const nameInput = document.getElementById('name'); // from contacts
 const emailInput = document.getElementById('email'); // from contacts
 const phoneInput = document.getElementById('phone'); // from contacts
 const contactList = document.getElementById('contactList'); // from contacts
-
-const formsSection = document.getElementById('forms-section');
+const formsModule = document.getElementById('forms-module'); // Renamed
 const formDefinitionForm = document.getElementById('formDefinitionForm');
 const formTitleInput = document.getElementById('formTitle');
 const formFieldsContainer = document.getElementById('formFieldsContainer');
+const editingFormIdInput = document.getElementById('editingFormId');
 const addFormFieldBtn = document.getElementById('addFormFieldBtn');
 const formsList = document.getElementById('formsList');
 
@@ -60,40 +62,52 @@ auth.onAuthStateChanged(user => {
         currentUid = user.uid;
         userDetails.textContent = `Logged in as: ${user.email}`;
         loginBtn.style.display = 'none';
-        logoutBtn.style.display = 'block';
-        contactsSection.style.display = 'block';
-        formsSection.style.display = 'none';
+        loggedInUserDiv.style.display = 'block';
+
+        // Show contacts module by default after login
+        contactsModule.style.display = 'block';
+        formsModule.style.display = 'none';
+        document.getElementById('navContactsLink').classList.add('active');
+        document.getElementById('navFormsLink').classList.remove('active');
+
         loadContacts();
         // loadForms() is called when navigating to forms section
     } else {
         currentUid = null;
         userDetails.textContent = 'Not logged in.';
         loginBtn.style.display = 'block';
-        logoutBtn.style.display = 'none';
-        contactsSection.style.display = 'none';
-        formsSection.style.display = 'none';
+        loggedInUserDiv.style.display = 'none';
+
+        contactsModule.style.display = 'none';
+        formsModule.style.display = 'none';
         viewSubmissionsView.style.display = 'none';
         contactList.innerHTML = ''; // Clear contacts if logged out
         formsList.innerHTML = ''; // Clear forms if logged out
     }
 });
 
-// Navigation
-document.getElementById('navContacts').addEventListener('click', () => {
+// Navigation - update active states and module visibility
+document.getElementById('navContacts').addEventListener('click', (e) => {
+    e.preventDefault();
     if (!currentUid) return;
-    contactsSection.style.display = 'block';
-    formsSection.style.display = 'none';
+    contactsModule.style.display = 'block';
+    formsModule.style.display = 'none';
+    document.getElementById('navContactsLink').classList.add('active');
+    document.getElementById('navFormsLink').classList.remove('active');
 });
 
-document.getElementById('navForms').addEventListener('click', () => {
+document.getElementById('navForms').addEventListener('click', (e) => {
+    e.preventDefault();
     if (!currentUid) return;
-    contactsSection.style.display = 'none';
-    formsSection.style.display = 'block';
+    contactsModule.style.display = 'none';
+    formsModule.style.display = 'block';
     createFormView.style.display = 'block'; // Show create form view by default
     listFormsView.style.display = 'block'; // Show list of forms
     fillFormView.style.display = 'none'; // Hide fill form view
     viewSubmissionsView.style.display = 'none';
     loadForms();
+    document.getElementById('navFormsLink').classList.add('active');
+    document.getElementById('navContactsLink').classList.remove('active');
 });
 
 
@@ -120,7 +134,7 @@ contactForm.addEventListener('submit', async (e) => {
         name: nameInput.value,
         email: emailInput.value,
         phone: phoneInput.value,
-        userId: currentUid, // Associate contact with the logged-in user
+        ownerAdminUid: currentUid, // This admin owns/created this contact
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
@@ -149,7 +163,10 @@ async function loadContacts() {
 
     contactList.innerHTML = 'Loading...';
     try {
-        const snapshot = await contactsCollection.where("userId", "==", currentUid).orderBy("createdAt", "desc").get();
+        // Load contacts where the ownerAdminUid matches the current logged-in admin
+        const snapshot = await contactsCollection
+            .where("ownerAdminUid", "==", currentUid)
+            .orderBy("createdAt", "desc").get();
         if (snapshot.empty) {
             contactList.innerHTML = '<li>No contacts found.</li>';
             return;
@@ -158,10 +175,12 @@ async function loadContacts() {
         snapshot.forEach(doc => {
             const contact = doc.data();
             html += `
-                <li data-id="${doc.id}">
-                    ${contact.name} - ${contact.email || ''} - ${contact.phone || ''}
-                    <button onclick="editContact('${doc.id}', '${contact.name}', '${contact.email || ''}', '${contact.phone || ''}')">Edit</button>
-                    <button onclick="deleteContact('${doc.id}')">Delete</button>
+                <li class="list-group-item" data-id="${doc.id}">
+                    <span>${contact.name} - ${contact.email || ''} - ${contact.phone || ''}</span>
+                    <div class="btn-group pull-right" role="group">
+                        <button class="btn btn-xs btn-warning" onclick="editContact('${doc.id}', '${contact.name}', '${contact.email || ''}', '${contact.phone || ''}')">Edit</button>
+                        <button class="btn btn-xs btn-danger" onclick="deleteContact('${doc.id}')">Delete</button>
+                    </div>
                 </li>`;
         });
         contactList.innerHTML = html;
@@ -195,7 +214,11 @@ async function deleteContact(id) {
 }
 
 sharePublicContactFormBtn.addEventListener('click', () => {
-    const publicContactFormUrl = `${window.location.origin}${window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}/public-contact-form.html`;
+    if (!currentUid) {
+        alert("Please log in to get a shareable link.");
+        return;
+    }
+    const publicContactFormUrl = `${window.location.origin}${window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))}/public-contact-form.html?adminUid=${currentUid}`;
     prompt("Share this link for public contact submission:", publicContactFormUrl);
 });
 
@@ -207,15 +230,16 @@ let fieldCounter = 0; // Counter for unique field IDs in form definition
 addFormFieldBtn.addEventListener('click', () => {
     fieldCounter++;
     const fieldDiv = document.createElement('div');
-    fieldDiv.classList.add('form-field-definition');
+    // Use Bootstrap 'well' for better visual grouping of each field definition
+    fieldDiv.classList.add('form-field-definition', 'well', 'well-sm'); 
     fieldDiv.innerHTML = `
-        <div>
+        <div class="form-group">
             <label for="fieldLabel${fieldCounter}">Field Label:</label>
-            <input type="text" id="fieldLabel${fieldCounter}" name="fieldLabel" placeholder="E.g., Full Name" required>
+            <input type="text" class="form-control input-sm" id="fieldLabel${fieldCounter}" name="fieldLabel" placeholder="E.g., Full Name, Agree to Terms" required>
         </div>
-        <div>
+        <div class="form-group">
             <label for="fieldType${fieldCounter}">Field Type:</label>
-            <select id="fieldType${fieldCounter}" name="fieldType">
+            <select class="form-control input-sm" id="fieldType${fieldCounter}" name="fieldType">
                 <option value="text">Text</option>
                 <option value="email">Email</option>
                 <option value="tel">Phone</option>
@@ -223,15 +247,20 @@ addFormFieldBtn.addEventListener('click', () => {
                 <option value="textarea">Text Area</option>
                 <option value="checkbox">Checkbox</option>
                 <option value="number">Number</option>
-                <!-- Consider adding 'select' with options later -->
+                <!-- Future: <option value="select">Dropdown (Select)</option> -->
+                <!-- Future: <option value="radio">Radio Buttons</option> -->
             </select>
         </div>
-        <button type="button" onclick="this.parentElement.remove()">Remove Field</button>
-        <hr>
+        <!-- Placeholder for checkbox-specific options, like default checked state, if needed later -->
+        <!-- <div class="form-group checkbox-options" style="display:none;">
+            <label><input type="checkbox" name="defaultChecked${fieldCounter}"> Default to checked?</label>
+        </div> -->
+        <button type="button" class="btn btn-danger btn-xs" onclick="this.parentElement.remove()">Remove Field</button>
     `;
     formFieldsContainer.appendChild(fieldDiv);
 });
 
+// Handle both creating new forms and updating existing ones
 formDefinitionForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!currentUid) {
@@ -239,6 +268,7 @@ formDefinitionForm.addEventListener('submit', async (e) => {
         return;
     }
 
+    const formIdToEdit = editingFormIdInput.value;
     const title = formTitleInput.value.trim();
     const fields = [];
     const fieldElements = formFieldsContainer.querySelectorAll('.form-field-definition');
@@ -274,12 +304,21 @@ formDefinitionForm.addEventListener('submit', async (e) => {
     };
 
     try {
-        await formsCollection.add(formDefinition);
-        alert("Form definition saved!");
+        if (formIdToEdit) {
+            // Update existing form
+            await formsCollection.doc(formIdToEdit).update(formDefinition);
+            alert("Form definition updated!");
+        } else {
+            // Add new form
+            await formsCollection.add(formDefinition);
+            alert("Form definition saved!");
+        }
         formDefinitionForm.reset();
+        editingFormIdInput.value = ''; // Clear editing ID
         formFieldsContainer.innerHTML = '';
         fieldCounter = 0;
         loadForms();
+        document.getElementById('saveFormDefinitionBtn').textContent = 'Save Form Definition'; // Reset button text
     } catch (error) {
         console.error("Error saving form definition: ", error);
         alert("Error saving form: " + error.message);
@@ -300,18 +339,78 @@ async function loadForms() {
         snapshot.forEach(doc => {
             const form = doc.data();
             html += `
-                <li data-id="${doc.id}">
-                    ${form.title}
-                    <button onclick="renderFormForFilling('${doc.id}')">Fill Out (Admin)</button>
-                    <button onclick="viewFormSubmissions('${doc.id}', '${form.title}')">View Submissions</button>
-                    <button onclick="shareForm('${doc.id}')">Share Public Link</button>
-                    <button onclick="deleteFormDefinition('${doc.id}')">Delete Definition</button>
+                <li class="list-group-item" data-id="${doc.id}">
+                    <span>${form.title}</span>
+                    <div class="btn-group pull-right">
+                        <button class="btn btn-xs btn-warning" onclick="prepareEditFormDefinition('${doc.id}')">Edit</button>
+                        <button class="btn btn-xs btn-info" onclick="renderFormForFilling('${doc.id}')">Fill Out</button>
+                        <button class="btn btn-xs btn-primary" onclick="viewFormSubmissions('${doc.id}', '${form.title}')">View Submissions</button>
+                        <button class="btn btn-xs btn-default" onclick="shareForm('${doc.id}')">Share Link</button>
+                        <button class="btn btn-xs btn-danger" onclick="deleteFormDefinition('${doc.id}')">Delete Def.</button>
+                    </div>
                 </li>`;
         });
         formsList.innerHTML = html;
     } catch (error) {
         console.error("Error loading forms: ", error);
         formsList.innerHTML = '<li>Error loading forms.</li>';
+    }
+}
+
+async function prepareEditFormDefinition(formId) {
+    if (!currentUid) return;
+
+    try {
+        const formDoc = await formsCollection.doc(formId).get();
+        if (!formDoc.exists) {
+            alert("Form definition not found for editing.");
+            return;
+        }
+        const formData = formDoc.data();
+
+        // Populate the form definition form
+        editingFormIdInput.value = formId;
+        formTitleInput.value = formData.title;
+
+        formFieldsContainer.innerHTML = ''; // Clear existing fields
+        fieldCounter = 0; // Reset counter for new fields if any are added
+
+        formData.fields.forEach(field => {
+            fieldCounter++; // Increment for unique IDs, though these are pre-existing
+            const fieldDiv = document.createElement('div');
+            fieldDiv.classList.add('form-field-definition');
+            // Note: The IDs for label and select might not perfectly match fieldCounter if fields were reordered/deleted in DB,
+            // but for populating the form, this structure is fine. The 'name' attribute is what matters for submission.
+            fieldDiv.innerHTML = `
+                <div>
+                    <label for="fieldLabel${fieldCounter}">Field Label:</label>
+                    <input type="text" id="fieldLabel${fieldCounter}" name="fieldLabel" value="${field.label}" placeholder="E.g., Full Name" required>
+                </div>
+                <div>
+                    <label for="fieldType${fieldCounter}">Field Type:</label>
+                    <select id="fieldType${fieldCounter}" name="fieldType">
+                        <option value="text" ${field.type === 'text' ? 'selected' : ''}>Text</option>
+                        <option value="email" ${field.type === 'email' ? 'selected' : ''}>Email</option>
+                        <option value="tel" ${field.type === 'tel' ? 'selected' : ''}>Phone</option>
+                        <option value="date" ${field.type === 'date' ? 'selected' : ''}>Date</option>
+                        <option value="textarea" ${field.type === 'textarea' ? 'selected' : ''}>Text Area</option>
+                        <option value="checkbox" ${field.type === 'checkbox' ? 'selected' : ''}>Checkbox</option>
+                        <option value="number" ${field.type === 'number' ? 'selected' : ''}>Number</option>
+                    </select> <small class="text-muted">(Type of input field)</small>
+                </div>
+                <button type="button" class="btn btn-xs btn-danger" onclick="this.parentElement.remove()">Remove Field</button>
+                <hr>
+            `;
+            formFieldsContainer.appendChild(fieldDiv);
+        });
+
+        document.getElementById('saveFormDefinitionBtn').textContent = 'Update Form Definition';
+        // Scroll to the top to see the populated form
+        window.scrollTo(0, document.getElementById('create-form-view').offsetTop);
+
+    } catch (error) {
+        console.error("Error preparing form for editing: ", error);
+        alert("Could not load form definition for editing.");
     }
 }
 
@@ -338,7 +437,7 @@ async function renderFormForFilling(formId) {
 
         formData.fields.forEach(field => {
             const fieldWrapper = document.createElement('div');
-            fieldWrapper.classList.add('form-group');
+            fieldWrapper.classList.add('form-group'); // Bootstrap class
 
             const label = document.createElement('label');
             label.setAttribute('for', field.name);
@@ -352,7 +451,7 @@ async function renderFormForFilling(formId) {
                 inputElement = document.createElement('input');
                 inputElement.type = field.type;
             }
-
+            inputElement.classList.add('form-control'); // Bootstrap class
             inputElement.id = field.name;
             inputElement.name = field.name;
             if (field.placeholder) inputElement.placeholder = field.placeholder;
@@ -365,6 +464,7 @@ async function renderFormForFilling(formId) {
 
         const submitButton = document.createElement('button');
         submitButton.type = 'submit';
+        submitButton.classList.add('btn', 'btn-primary'); // Bootstrap class
         submitButton.textContent = 'Submit Form';
         dynamicForm.appendChild(submitButton);
 
@@ -460,9 +560,11 @@ async function viewFormSubmissions(formId, formTitle) {
                         summary = `${submission.data[emailField]} - ${submissionDate}`;
                     }
                 }
-                html += `<li data-submission-id="${doc.id}">
+                html += `<li class="list-group-item" data-submission-id="${doc.id}">
                             <span>${summary}</span>
-                            <div><button onclick="viewSubmissionDetail('${doc.id}')">View Details</button> <button class="delete-submission-btn" onclick="deleteSubmission('${doc.id}', '${formId}', '${formTitle}')">Delete</button></div>
+                            <div class="btn-group pull-right">
+                                <button class="btn btn-xs btn-info" onclick="viewSubmissionDetail('${doc.id}')">View Details</button> 
+                                <button class="btn btn-xs btn-danger delete-submission-btn" onclick="deleteSubmission('${doc.id}', '${formId}', '${formTitle}')">Delete</button></div>
                          </li>`;
             });
             submissionsList.innerHTML = html;
@@ -515,7 +617,7 @@ async function viewSubmissionDetail(submissionId) {
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete This Submission';
         deleteButton.onclick = () => deleteSubmission(submissionId, submissionData.formId, submissionData.formTitle);
-        deleteButton.style.marginTop = '10px';
+        deleteButton.classList.add('btn', 'btn-danger', 'btn-sm');
         deleteButton.style.backgroundColor = '#d9534f'; // Red color for delete
         submissionDetailContent.appendChild(deleteButton);
 

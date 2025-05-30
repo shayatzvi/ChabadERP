@@ -2,107 +2,136 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chabad House ERP - Contacts</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Chabad House ERP</title>
+    <!-- Bootstrap 3 CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="style.css">
-    <style> 
-    #sharePublicContactFormBtn {
-  display: none !important;
-}</style>
 </head>
 <body>
-    <header>
-        <h1>Chabad House ERP</h1>
-        <nav>
-            <button id="navContacts">Contacts</button>
-            <button id="navForms">Forms</button>
-        </nav>
-    </header>
-
-    <main>
-        <section id="auth-section">
-            <h2>Authentication</h2>
-            <button id="loginBtn">Login with Google</button>
-            <button id="logoutBtn" style="display:none;">Logout</button>
-            <p id="userDetails"></p>
-        </section>
-
-        <section id="contacts-section" style="display:none;">
-            <h2>Contacts Management</h2>
-            <button type="button" id="sharePublicContactFormBtn" style="margin-bottom: 15px;">Share Public Add Contact Form Link (depracated)</button>
-            <form id="contactForm">
-                <h3>Add/Edit Contact</h3>
-                <input type="hidden" id="contactId">
-                <div>
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" required>
-                </div>
-                <div>
-                    <label for="email">Email:</label>
-                    <input type="email" id="email">
-                </div>
-                <div>
-                    <label for="phone">Phone:</label>
-                    <input type="tel" id="phone">
-                </div>
-                <button type="submit">Save Contact</button>
-            </form>
-
-            <h3>Contact List</h3>
-            <ul id="contactList">
-                <!-- Contacts will be listed here -->
-            </ul>
-        </section>
-
-        <section id="forms-section" style="display:none;">
-            <h2>Forms Management</h2>
-
-            <div id="create-form-view">
-                <h3>Create New Form</h3>
-                <form id="formDefinitionForm">
-                    <div>
-                        <label for="formTitle">Form Title:</label>
-                        <input type="text" id="formTitle" required>
-                    </div>
-                    <h4>Form Fields:</h4>
-                    <div id="formFieldsContainer">
-                        <!-- Dynamic fields will be added here -->
-                    </div>
-                    <button type="button" id="addFormFieldBtn">Add Field</button>
-                    <button type="submit">Save Form Definition</button>
-                </form>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Chabad House ERP</a>
             </div>
-
-            <div id="list-forms-view">
-                <h3>Available Forms</h3>
-                <ul id="formsList">
-                    <!-- Forms will be listed here -->
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li id="navContactsLink" class="active"><a href="#" id="navContacts">Contacts</a></li>
+                    <li id="navFormsLink"><a href="#" id="navForms">Forms</a></li>
                 </ul>
-            </div>
-
-            <div id="fill-form-view" style="display:none;">
-                <h3 id="fillFormTitle"></h3>
-                <form id="dynamicForm"></form>
-                <button id="backToFormsListBtn">Back to Forms List</button>
-            </div>
-
-            <div id="view-submissions-view" style="display:none;">
-                <h3 id="submissionsViewTitle">Form Submissions</h3>
-                <ul id="submissionsList">
-                    <!-- Submissions will be listed here -->
-                </ul>
-                <div id="submissionDetailView" style="display:none;">
-                    <h4>Submission Details:</h4>
-                    <div id="submissionDetailContent"></div> <!-- Changed from pre to div -->
-                    <button id="backToSubmissionsListBtn">Back to Submissions List</button>
+                <div id="auth-section-nav" class="navbar-right" style="padding-top: 8px; padding-right: 15px;">
+                     <button id="loginBtn" class="btn btn-success navbar-btn">Login with Google</button>
+                     <div id="loggedInUserDiv" style="display:none;">
+                        <p id="userDetails" class="navbar-text" style="margin-right: 10px;"></p>
+                        <button id="logoutBtn" class="btn btn-danger navbar-btn">Logout</button>
+                     </div>
                 </div>
-                <button id="backToFormsListFromSubmissionsBtn">Back to Forms List</button>
-            </div>
-        </section>
-    </main>
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
 
-    <footer>
-        <p>&copy; 2025 Chabad House ERP</p>
+    <div class="container" style="padding-top: 70px;"> <!-- Main content container -->
+
+        <div id="contacts-module"> <!-- Renamed from contacts-section for clarity -->
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Contacts Management</h3>
+                </div>
+                <div class="panel-body">
+                    <button type="button" id="sharePublicContactFormBtn" class="btn btn-info" style="margin-bottom: 15px;">Get Public "Add Contact" Form Link</button>
+                    <form id="contactForm">
+                        <h4>Add/Edit Contact</h4>
+                        <input type="hidden" id="contactId">
+                        <div class="form-group">
+                            <label for="name">Name:</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" class="form-control" id="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone:</label>
+                            <input type="tel" class="form-control" id="phone">
+                        </div>
+                        <button type="submit" class="btn btn-success">Save Contact</button>
+                    </form>
+                    <hr>
+                    <h4>Contact List</h4>
+                    <ul id="contactList" class="list-group">
+                        <!-- Contacts will be listed here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="forms-module" style="display:none;"> <!-- Renamed from forms-section for clarity -->
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Forms Management</h3>
+                </div>
+                <div class="panel-body">
+                    <div id="create-form-view">
+                        <h4>Create New Form</h4>
+                        <form id="formDefinitionForm">
+                            <div class="form-group">
+                                <input type="hidden" id="editingFormId"> <!-- Hidden field for form ID when editing -->
+                                <label for="formTitle">Form Title:</label>
+                                <input type="text" class="form-control" id="formTitle" required>
+                            </div>
+                            <h5>Form Fields:</h5>
+                            <div id="formFieldsContainer">
+                                <!-- Dynamic fields will be added here -->
+                            </div>
+                            <button type="button" id="addFormFieldBtn" class="btn btn-warning">Add Field</button>
+                            <button type="submit" id="saveFormDefinitionBtn" class="btn btn-success" style="margin-left: 5px;">Save Form Definition</button>
+                        </form>
+                    </div>
+                    <hr>
+                    <div id="list-forms-view">
+                        <h4>Available Forms</h4>
+                        <ul id="formsList" class="list-group">
+                            <!-- Forms will be listed here -->
+                        </ul>
+                    </div>
+
+                    <div id="fill-form-view" style="display:none;" class="well">
+                        <h4 id="fillFormTitle"></h4>
+                        <form id="dynamicForm"></form>
+                        <button id="backToFormsListBtn" class="btn btn-default">Back to Forms List</button>
+                    </div>
+
+                    <div id="view-submissions-view" style="display:none;" class="well">
+                        <h4 id="submissionsViewTitle">Form Submissions</h4>
+                        <ul id="submissionsList" class="list-group">
+                            <!-- Submissions will be listed here -->
+                        </ul>
+                        <div id="submissionDetailView" style="display:none;" class="panel panel-default">
+                            <div class="panel-heading">Submission Details:</div>
+                            <div class="panel-body" id="submissionDetailContent"></div>
+                            <div class="panel-footer">
+                                <button id="backToSubmissionsListBtn" class="btn btn-default">Back to Submissions List</button>
+                            </div>
+                        </div>
+                        <button id="backToFormsListFromSubmissionsBtn" class="btn btn-primary">Back to Forms List</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- /container -->
+
+    <footer class="footer">
+      <div class="container text-center">
+        <p class="text-muted">&copy; 2025 Chabad House ERP</p>
+      </div>
     </footer>
 
     <!-- Firebase SDK -->
@@ -111,5 +140,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <script src="app.js"></script>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Bootstrap 3 JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>

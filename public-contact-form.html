@@ -2,47 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Add Contact</title>
-    <link rel="stylesheet" href="style.css"> <!-- You can use the main style or a simplified one -->
+    <!-- Bootstrap 3 CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- You might want a separate, simpler CSS for public pages or link to the main style.css if it's general enough -->
+    <link rel="stylesheet" href="style.css"> 
     <style>
-        body { display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
-        main { max-width: 600px; width: 100%; }
-        .form-group label { display: block; margin-bottom: .5em; }
-        .form-group input { width: calc(100% - 22px); }
-        header h1 { font-size: 1.5em; }
+        body { padding-top: 20px; padding-bottom: 20px; } /* Basic padding */
+        .form-container { max-width: 500px; margin: auto; }
     </style>
 </head>
 <body>
- 
-        <h1>Join our list!</h1>
-   
-
-    <main>
-        <section id="public-contact-section">
-            <form id="publicContactForm">
-                <div class="form-group">
-                    <label for="publicContactName">Name:</label>
-                    <input type="text" id="publicContactName" required>
+    <div class="container">
+        <div class="form-container">
+            <div class="text-center">
+                <h1>Join our list!</h1>
+                <hr>
+            </div>
+            <div id="public-contact-section">
+                <form id="publicContactForm">
+                    <div class="form-group">
+                        <label for="publicContactName">Name:</label>
+                        <input type="text" class="form-control" id="publicContactName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="publicContactEmail">Email:</label>
+                        <input type="email" class="form-control" id="publicContactEmail">
+                    </div>
+                    <div class="form-group">
+                        <label for="publicContactPhone">Phone:</label>
+                        <input type="tel" class="form-control" id="publicContactPhone">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Submit Contact</button>
+                </form>
+                <div id="contactSubmissionMessage" class="alert" style="display:none; margin-top: 15px;"></div>
                 </div>
-                <div class="form-group">
-                    <label for="publicContactEmail">Email:</label>
-                    <input type="email" id="publicContactEmail">
-                </div>
-                <div class="form-group">
-                    <label for="publicContactPhone">Phone:</label>
-                    <input type="tel" id="publicContactPhone">
-                </div>
-                <button type="submit">Submit Contact</button>
-            </form>
-            <p id="contactSubmissionMessage" style="display:none; margin-top: 15px;"></p>
-        </section>
-    </main>
+        </div>
+    </div> <!-- /container -->
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <script src="public-contact-form-app.js"></script>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins, though not strictly needed for this simple form) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Bootstrap 3 JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 </html>

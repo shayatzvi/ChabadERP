@@ -19,6 +19,16 @@ const publicContactEmailInput = document.getElementById('publicContactEmail');
 const publicContactPhoneInput = document.getElementById('publicContactPhone');
 const contactSubmissionMessage = document.getElementById('contactSubmissionMessage');
 
+let adminUidFromUrl = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    adminUidFromUrl = urlParams.get('adminUid');
+    if (!adminUidFromUrl) {
+        console.warn("Admin UID not provided in URL. Submissions will not be directly associated with an admin account.");
+        // Optionally, you could hide the form or show a message if adminUid is strictly required.
+    }
+});
 publicContactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -27,8 +37,9 @@ publicContactForm.addEventListener('submit', async (e) => {
     const phone = publicContactPhoneInput.value.trim();
 
     if (!name) {
+        contactSubmissionMessage.className = 'alert alert-danger'; // Bootstrap class
         contactSubmissionMessage.textContent = "Name is required.";
-        contactSubmissionMessage.style.color = 'red';
+        // contactSubmissionMessage.style.color = 'red'; // Handled by alert-danger
         contactSubmissionMessage.style.display = 'block';
         return;
     }
@@ -38,9 +49,12 @@ publicContactForm.addEventListener('submit', async (e) => {
         email: email,
         phone: phone,
         source: 'public_form', // To identify contacts added via this form
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        // No userId is associated with publicly added contacts
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
+
+    if (adminUidFromUrl) {
+        contactData.ownerAdminUid = adminUidFromUrl; // Associate with the admin who shared the link
+    }
 
     const submitButton = publicContactForm.querySelector('button[type="submit"]');
     submitButton.disabled = true;
@@ -49,12 +63,12 @@ publicContactForm.addEventListener('submit', async (e) => {
     try {
         await contactsCollection.add(contactData);
         publicContactForm.reset();
+        contactSubmissionMessage.className = 'alert alert-success'; // Bootstrap class
         contactSubmissionMessage.textContent = 'Thank you! Your contact information has been submitted.';
-        contactSubmissionMessage.style.color = 'green';
     } catch (error) {
         console.error("Error submitting contact: ", error);
+        contactSubmissionMessage.className = 'alert alert-danger'; // Bootstrap class
         contactSubmissionMessage.textContent = "Error submitting contact: " + error.message;
-        contactSubmissionMessage.style.color = 'red';
     } finally {
         contactSubmissionMessage.style.display = 'block';
         submitButton.disabled = false;
