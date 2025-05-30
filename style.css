@@ -1,0 +1,110 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1em 0;
+    text-align: center;
+}
+
+main {
+    padding: 20px;
+}
+
+section {
+    background-color: #fff;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="number"], select, textarea {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #4cae4c;
+}
+
+button[type="button"] {
+    background-color: #f0ad4e;
+}
+button[type="button"]:hover {
+    background-color: #ec971f;
+}
+
+
+#contactList li, #formsList li, #submissionsList li {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#contactList li:last-child, #formsList li:last-child, #submissionsList li:last-child {
+    border-bottom: none;
+}
+
+.form-field-definition {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #ccc;
+}
+.form-field-definition:last-child {
+    border-bottom: none;
+}
+
+#submissionDetailView {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+#submissionDetailContent {
+    white-space: pre-wrap; /* Allows line breaks in the JSON string */
+    word-break: break-all;
+}
+
+#submissionDetailContent dl {
+    margin-top: 10px;
+}
+#submissionDetailContent dt {
+    font-weight: bold;
+    margin-top: 8px;
+}
+#submissionDetailContent dd {
+    margin-left: 20px;
+    margin-bottom: 8px;
+    word-break: break-word;
+}
+
+.delete-submission-btn {
+    background-color: #d9534f !important; /* Red for delete */
+}
+.delete-submission-btn:hover {
+    background-color: #c9302c !important;
+}

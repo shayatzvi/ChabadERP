@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Contact</title>
+    <link rel="stylesheet" href="style.css"> <!-- You can use the main style or a simplified one -->
+    <style>
+        body { display: flex; flex-direction: column; align-items: center; padding-top: 20px; }
+        main { max-width: 600px; width: 100%; }
+        .form-group label { display: block; margin-bottom: .5em; }
+        .form-group input { width: calc(100% - 22px); }
+        header h1 { font-size: 1.5em; }
+    </style>
+</head>
+<body>
+ 
+        <h1>Join our list!</h1>
+   
+
+    <main>
+        <section id="public-contact-section">
+            <form id="publicContactForm">
+                <div class="form-group">
+                    <label for="publicContactName">Name:</label>
+                    <input type="text" id="publicContactName" required>
+                </div>
+                <div class="form-group">
+                    <label for="publicContactEmail">Email:</label>
+                    <input type="email" id="publicContactEmail">
+                </div>
+                <div class="form-group">
+                    <label for="publicContactPhone">Phone:</label>
+                    <input type="tel" id="publicContactPhone">
+                </div>
+                <button type="submit">Submit Contact</button>
+            </form>
+            <p id="contactSubmissionMessage" style="display:none; margin-top: 15px;"></p>
+        </section>
+    </main>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script src="public-contact-form-app.js"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chabad House ERP - Contacts</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Chabad House ERP</h1>
+        <nav>
+            <button id="navContacts">Contacts</button>
+            <button id="navForms">Forms</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="auth-section">
+            <h2>Authentication</h2>
+            <button id="loginBtn">Login with Google</button>
+            <button id="logoutBtn" style="display:none;">Logout</button>
+            <p id="userDetails"></p>
+        </section>
+
+        <section id="contacts-section" style="display:none;">
+            <h2>Contacts Management</h2>
+            <button type="button" id="sharePublicContactFormBtn" style="margin-bottom: 15px;">Share Public Add Contact Form Link</button>
+            <form id="contactForm">
+                <h3>Add/Edit Contact</h3>
+                <input type="hidden" id="contactId">
+                <div>
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" required>
+                </div>
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email">
+                </div>
+                <div>
+                    <label for="phone">Phone:</label>
+                    <input type="tel" id="phone">
+                </div>
+                <button type="submit">Save Contact</button>
+            </form>
+
+            <h3>Contact List</h3>
+            <ul id="contactList">
+                <!-- Contacts will be listed here -->
+            </ul>
+        </section>
+
+        <section id="forms-section" style="display:none;">
+            <h2>Forms Management</h2>
+
+            <div id="create-form-view">
+                <h3>Create New Form</h3>
+                <form id="formDefinitionForm">
+                    <div>
+                        <label for="formTitle">Form Title:</label>
+                        <input type="text" id="formTitle" required>
+                    </div>
+                    <h4>Form Fields:</h4>
+                    <div id="formFieldsContainer">
+                        <!-- Dynamic fields will be added here -->
+                    </div>
+                    <button type="button" id="addFormFieldBtn">Add Field</button>
+                    <button type="submit">Save Form Definition</button>
+                </form>
+            </div>
+
+            <div id="list-forms-view">
+                <h3>Available Forms</h3>
+                <ul id="formsList">
+                    <!-- Forms will be listed here -->
+                </ul>
+            </div>
+
+            <div id="fill-form-view" style="display:none;">
+                <h3 id="fillFormTitle"></h3>
+                <form id="dynamicForm"></form>
+                <button id="backToFormsListBtn">Back to Forms List</button>
+            </div>
+
+            <div id="view-submissions-view" style="display:none;">
+                <h3 id="submissionsViewTitle">Form Submissions</h3>
+                <ul id="submissionsList">
+                    <!-- Submissions will be listed here -->
+                </ul>
+                <div id="submissionDetailView" style="display:none;">
+                    <h4>Submission Details:</h4>
+                    <div id="submissionDetailContent"></div> <!-- Changed from pre to div -->
+                    <button id="backToSubmissionsListBtn">Back to Submissions List</button>
+                </div>
+                <button id="backToFormsListFromSubmissionsBtn">Back to Forms List</button>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 Chabad House ERP</p>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script src="app.js"></script>
+</body>
+</html>
